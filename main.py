@@ -71,6 +71,16 @@ async def get_author(author_name: str):
 
 
 # Update author by id
+@app.put("/author/{author_id}", response_model=AuthorSchema)
+async def update_author(author_id: str, author_update: AuthorSchema):
+    with db_session() as session:
+        author_found = session.query(AuthorsModel).filter(AuthorsModel.id == author_id).first()
+        if author_found is None:
+            raise HTTPException(status_code=404, detail="Author not found")
+        author_found.name = author_update.name
+        session.commit()
+        session.refresh(author_found)
+    return author_found
 
 
 @app.get("/")

@@ -8,6 +8,12 @@ from myapp import db_session
 from src.models import SubNavBar
 
 
+def check_if_exists(url_to_check):
+    with db_session() as session:
+        if session.query(SubNavBar.url).filter(SubNavBar.url == url_to_check).first() is None:
+            return 0
+        return 1
+
 def get_from_dropdown():
 
     driver = webdriver.Chrome()
@@ -37,12 +43,15 @@ def get_from_dropdown():
             class_names = element.a.get('title', [])
             name = ' '.join(class_names) if isinstance(class_names, list) else class_names
 
-            # Create SubNavBar object
-            element_to_db = SubNavBar(
-                url=url,
-                name=name
-            )
-            session.add(element_to_db)
+            if check_if_exists(url) == 1:
+                continue
+            else:
+                # Create SubNavBar object
+                element_to_db = SubNavBar(
+                    url=url,
+                    name=name
+                )
+                session.add(element_to_db)
         session.commit()
 
     # Close the WebDriver

@@ -1,11 +1,11 @@
-# TODO: currently not getting articles from main categories. Fix it
-
 import re
 
 import requests
 from bs4 import BeautifulSoup
+from slugify import slugify
 from text_unidecode import unidecode
 
+from frontQueries.getParentDirect import get_parent_directory
 from myapp import db_session
 from src.models import SubNavBar, Articles, MainNavBar
 
@@ -30,9 +30,9 @@ def get_subpage_url():
             url_list.add(subpage_url)
     return url_list
 
-def check_if_exists(title_to_check):
+def check_if_exists(url_to_check):
     with db_session() as session:
-        if session.query(Articles.title).filter(Articles.title == title_to_check).first() is None:
+        if session.query(Articles.url).filter(Articles.title == url_to_check).first() is None:
             return 0
         return 1
 
@@ -64,8 +64,10 @@ def get_tag(url):
     # Check if tag exists in subnav db, if not, add it to subnav db
     with db_session() as session:
         if session.query(SubNavBar.url).filter(SubNavBar.url == tag).first() is None:
+            parent_directory = get_parent_directory(url)
             element_to_db = SubNavBar(url=tag,
-                                      name=tag_name)
+                                      name=tag_name,
+                                      parent_category=parent_directory)
             session.add(element_to_db)
             session.commit()
     return tag
@@ -84,7 +86,7 @@ def get_sub_articles():
 
                 url = news.a.get('href')
 
-                # If url == '#' or url == None
+                # If url is invalid
                 if not url or not url.startswith('https'):
                     continue
 
@@ -92,7 +94,7 @@ def get_sub_articles():
                 class_titles = news.a.get('title', [])
                 title = ' '.join(class_titles) if isinstance(class_titles, list) else class_titles
 
-                if check_if_exists(title):
+                if check_if_exists(url):
                     continue
 
                 api_url = re.sub(r'[^A-Za-z0-9 ]+', '', unidecode(title.lower())).replace(' ', '-')
@@ -103,7 +105,8 @@ def get_sub_articles():
                     api_url=api_url,
                     title=title,
                     published_date=published_date,
-                    tag=tag
+                    tag=tag,
+                    # author=author       # TODO
                 )
                 session.add(element_to_db)
                 session.commit()

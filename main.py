@@ -1,10 +1,11 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.encoders import jsonable_encoder
-
+from fastapi import FastAPI
 from pydantic import BaseModel
+
 from myapp import db_session
 from src.models import Articles as ArticlesModel
-from src.models import Authors as AuthorsModel
+from src.models import Images as ImagesModel
+from src.models import MainNavBar as MainNavBarModel
+from src.models import SubNavBar as SubNavBarModel
 
 app = FastAPI()
 
@@ -18,6 +19,24 @@ class ArticleSchema(BaseModel):
         from_attributes = True
 
 
+# Define pydantic main navbar model
+class MainNavBarSchema(BaseModel):
+    url: str | None = None
+    name: str | None = None
+
+    class Config:
+        from_attributes = True
+
+
+# Define pydantic sub navbar model
+class SubNavBarSchema(BaseModel):
+    url: str | None = None
+    name: str | None = None
+
+    class Config:
+        from_attributes = True
+
+
 # Define pydantic author model
 class AuthorSchema(BaseModel):
     name: str | None = None
@@ -26,63 +45,52 @@ class AuthorSchema(BaseModel):
         from_attributes = True
 
 
-# Get article by title
-@app.get("/article/{article_title}")
-async def get_article(article_title: str):
-    with db_session() as session:
-        article_found = session.query(ArticlesModel).filter(ArticlesModel.title.startswith(article_title)).all()
-        if article_found is None:
-            raise HTTPException(status_code=404, detail="Article not found")
-    return article_found
+# Define pydantic image model
+class ImageSchema(BaseModel):
+    image_src: str | None = None
+    alt: str | None = None
 
-# Delete article by id
-@app.delete("/article/{article_id}")
-async def delete_article(article_id: str):
-    with db_session() as session:
-        article_found = session.query(ArticlesModel).filter(ArticlesModel.id == article_id).first()
-        if article_found is None:
-            raise HTTPException(status_code=404, detail="Article not found")
-        session.delete(article_found)
-        session.commit()
-    return {"message": "Article deleted"}
-
-# Update article based on ID
-@app.put("/article/{article_id}", response_model=ArticleSchema)
-async def update_article(article_id: str, article_update: ArticleSchema):
-    with db_session() as session:
-        article_found = session.query(ArticlesModel).filter(ArticlesModel.id == article_id).first()
-        if article_found is None:
-            raise HTTPException(status_code=404, detail="Author not found")
-        article_found.title = article_update.title
-        session.commit()
-        session.refresh(article_found)
-    return article_found
+    class Config:
+        from_attributes = True
 
 
-
-# Get author by name
-@app.get("/author/{author_name}")
-async def get_author(author_name: str):
-    with db_session() as session:
-        author_found = session.query(AuthorsModel).filter(AuthorsModel.name.startswith(author_name)).all()
-        if author_found is None:
-            raise HTTPException(status_code=404, detail="Article not found")
-    return author_found
-
-
-# Update author by id
-@app.put("/author/{author_id}", response_model=AuthorSchema)
-async def update_author(author_id: str, author_update: AuthorSchema):
-    with db_session() as session:
-        author_found = session.query(AuthorsModel).filter(AuthorsModel.id == author_id).first()
-        if author_found is None:
-            raise HTTPException(status_code=404, detail="Author not found")
-        author_found.name = author_update.name
-        session.commit()
-        session.refresh(author_found)
-    return author_found
-
-
+# Get main categories, default
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+async def get_main_categories():
+    with db_session() as session:
+        main_categories = session.query(MainNavBarModel).all()
+    return main_categories
+
+
+# Open categories, display articles within that category
+@app.get("/{category}")
+async def get_articles_by_main_category(category: str):
+    with db_session() as session:
+        articles = session.query(ArticlesModel).filter(ArticlesModel.tag == '/' + category).all()
+        sub_categories = session.query(SubNavBarModel).filter(SubNavBarModel.parent_category == '/' + category).all()
+    return {'sub categories': sub_categories,
+            'articles': articles}
+
+
+# TODO
+#   Error: 404 Not Found
+#   Srsly no clue how to do this mate
+# Open sub categories, display articles within that subcategory
+@app.get("/{sub_category}")
+async def get_articles_by_sub_category(sub_category: str):
+    with db_session() as session:
+        pass
+    return {'articles': 'TODO'}
+
+
+# Get article based on article's api url
+@app.get("/article/{article_api_url}")
+async def get_article(article_api_url: str):
+    with db_session() as session:
+        article = session.query(ArticlesModel).filter(ArticlesModel.api_url == article_api_url).first()
+        images = session.query(ImagesModel).filter(ImagesModel.article_src == article.url).all()
+    return {'article': article,
+            'images': images}
+
+# TODO
+#   Get articles based on authors

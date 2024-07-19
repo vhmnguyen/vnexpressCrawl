@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -92,5 +93,5 @@ async def get_article(article_api_url: str):
     return {'article': article,
             'images': images}
 
-# TODO
-#   Get articles based on authors
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

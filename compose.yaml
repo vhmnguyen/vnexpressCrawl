@@ -9,8 +9,8 @@
 # https://github.com/docker/awesome-compose
 services:
   server:
-    build:
-      context: .
+    build: ./vnexpressCrawl
+#      context: .
     ports:
       - 8000:8000
 

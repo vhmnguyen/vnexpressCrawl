@@ -13,7 +13,7 @@ services:
 #      context: .
     ports:
       - 8000:8000
-    something:
+    db:
       image: "crawlapp:latest"
 
 # The commented out section below is an example of how to define a PostgreSQL

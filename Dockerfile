@@ -34,8 +34,7 @@ RUN adduser \
 RUN pip install update && \
     pip install -y default-libmysqlclient-dev build-essential && \
     pip install clean && \
-    pip install python3-pip && \
-    pip install lib
+    pip install python3-pip
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.

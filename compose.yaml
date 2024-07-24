@@ -23,32 +23,33 @@ services:
 # database data between container restarts. The `db-password` secret is used
 # to set the database password. You must create `db/password.txt` and add
 # a password of your choosing to it before running `docker compose up`.
-    depends_on:
-       db:
-         condition: service_healthy
-  db:
-     image: mysql
-     restart: always
-     user: root
-     secrets:
-       - db-password
+#    depends_on:
+#       db:
+#         condition: service_healthy
+#  db:
+#     image: mysql
+#     restart: always
+#     user: root
+#     secrets:
+#       - db-password
 #     volumes:
-#       - db-data:/var/lib/postgresql/data
-     environment:
-          MYSQL_HOST: db
-          MYSQL_DB: crawlprojdb
-          MYSQL_ROOT_PASSWORD: /run/secrets/db-password
-     expose:
-       - 33060
-     healthcheck:
-       test: [ "CMD", "pg_isready" ]
-       interval: 10s
-       timeout: 5s
-       retries: 5
-       start_period: 15s
-volumes:
-   db-data:
-secrets:
-   db-password:
-     file: db/password.txt
+#       - db-data:/var/lib/mysql
+#     environment:
+#          MYSQL_HOST: db
+#          MYSQL_DB: crawlprojdb
+#          MYSQL_ROOT_PASSWORD: /run/secrets/db-password
+#     expose:
+#       - 33060
+#     healthcheck:
+#       test: [ "CMD", "pg_isready" ]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#       start_period: 15s
+#volumes:
+#   db-data:
+#secrets:
+#   db-password:
+#     file: db/password.txt
+
 

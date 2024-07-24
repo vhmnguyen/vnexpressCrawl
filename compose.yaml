@@ -12,6 +12,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: taolavu18112005
+      MYSQL_DB: crawlprojdb
     ports:
       - 8000:8000
     volumes:

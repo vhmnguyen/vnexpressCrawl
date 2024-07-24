@@ -33,8 +33,7 @@ RUN adduser \
 # Install system dependencies
 RUN apt-get update && \
     apt-get install -y default-libmysqlclient-dev build-essential python3-pip && \
-    apt-get clean && \
-    apt-get lib
+    apt-get clean
 
 # Use pip for Python packages
 RUN pip3 install --upgrade pip

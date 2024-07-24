@@ -16,5 +16,5 @@ class BaseModel(Base):
     pass
 
 
-engine = create_engine("mysql://root:taolavu18112005@localhost/crawlProjDB")
+engine = create_engine("mysql://root:taolavu18112005@localhost/crawlProjDB", pool_pre_ping=True)
 db_session = sessionmaker(autocommit=False, autoflush=False, bind=engine)

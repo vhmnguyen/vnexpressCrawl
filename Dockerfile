@@ -32,7 +32,7 @@ RUN adduser \
 
 # Install system dependencies
 RUN pip install update && \
-    pip install install -y default-libmysqlclient-dev build-essential && \
+    pip install -y default-libmysqlclient-dev build-essential && \
     pip install clean && \
     pip install python3-pip && \
     pip install lib

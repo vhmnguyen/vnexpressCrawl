@@ -12,7 +12,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
+#   environment:
 #     MYSQL_HOST: 
 #     MYSQL_PASSWORD:
 #     MYSQL_DB: 

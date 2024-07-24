@@ -9,10 +9,13 @@
 # https://github.com/docker/awesome-compose
 services:
   server:
-    build: ./vnexpressCrawl
-#      context: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - 8000:8000
+    volumes:
+      - .:/python-fastapi
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to

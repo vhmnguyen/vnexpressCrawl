@@ -38,7 +38,6 @@ RUN apt-get update && \
 # Use pip for Python packages
 RUN pip3 install --upgrade pip
 
-
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
 # Leverage a bind mount to requirements.txt to avoid having to copy them into
@@ -46,6 +45,7 @@ RUN pip3 install --upgrade pip
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
+
 
 # Switch to the non-privileged user to run the application.
 USER appuser
@@ -55,6 +55,9 @@ COPY . .
 
 # Expose the port that the application listens on.
 EXPOSE 8000
+
+# Add environment variables for the database connection
+# ENV DATABASE_URL=mysql://root:{insert_password}@0.0.0.0:3306/{insert_db}
 
 # Run the application.
 CMD ["python", "main.py"]
